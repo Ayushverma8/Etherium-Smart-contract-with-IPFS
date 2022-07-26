@@ -9,7 +9,6 @@ import { createRequire } from "module";
 const require = createRequire(import.meta.url);
 import { create } from "ipfs-http-client";
 const client = create();
-import { generateKeyPairSync, sign } from "crypto";
 
 import { AbortController } from "node-abort-controller";
 const crypto = require("crypto");
@@ -61,7 +60,7 @@ var callStoreOnLocalGanache = async function () {
   const [
     { publicKey: publicKeyBuyer, privateKey: privateKeyBuyer },
     { publicKey: publicKeySeller, privateKey: privateKeySeller },
-  ] = keyOptions.map((options) => generateKeyPairSync("rsa", options));
+  ] = keyOptions.map((options) => crypto.generateKeyPairSync("rsa", options));
   // Setup done for the public an private key
 
   // Setting up reading from the IPFS
@@ -153,7 +152,7 @@ var callStoreOnLocalGanache = async function () {
     });
 };
 
-let contractAddr = "0x2900e8F6770797F060028bD89deB929345Ee09eC";
+let contractAddr = "0x8e9a8455172E7DD0DF698ffe35932adBD80dF3e7";
 let abi = [
   {
     inputs: [],
