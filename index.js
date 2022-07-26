@@ -84,7 +84,7 @@ var callStoreOnLocalGanache = async function () {
           content = [...content, ...chunk];
           const raw = Buffer.from(content).toString("utf8");
           const signature_buyer = crypto.sign("sha256", Buffer.from(raw), {
-            key: privateKeySeller,
+            key: privateKeyBuyer,
             padding: crypto.constants.RSA_PKCS1_PSS_PADDING,
           });
           const signature_seller = crypto.sign("sha256", Buffer.from(raw), {
@@ -108,6 +108,22 @@ var callStoreOnLocalGanache = async function () {
                     "Retrieving the Transaction via the ganache NET",
                     recippt
                   );
+
+                  const isVerified = crypto.verify(
+                    "sha256",
+                    raw,
+                    {
+                      key: publicKeyBuyer,
+                      padding: crypto.constants.RSA_PKCS1_PSS_PADDING,
+                    },
+                    Buffer.from(recippt, "base64")
+                  );
+
+                  // isVerified should be `true` if the signature is valid
+                  console.log(
+                    "Verifing signature from the IPFS file and matching it with the smart contract value"
+                  );
+                  console.log("signature verified status : ", isVerified);
                 })
                 .catch((error) => {
                   console.log(error);
@@ -133,6 +149,21 @@ var callStoreOnLocalGanache = async function () {
                     "Retrieving the Transaction via the ganache NET",
                     JSON.stringify(recippt, null, 4)
                   );
+                  const isVerified = crypto.verify(
+                    "sha256",
+                    raw,
+                    {
+                      key: publicKeySeller,
+                      padding: crypto.constants.RSA_PKCS1_PSS_PADDING,
+                    },
+                    Buffer.from(recippt, "base64")
+                  );
+
+                  // isVerified should be `true` if the signature is valid
+                  console.log(
+                    "Verifing signature from the IPFS file and matching it with the smart contract returned signature for the Buyer"
+                  );
+                  console.log("signature verified status : ", isVerified);
                 })
                 .catch((error) => {
                   console.log(error);
