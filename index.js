@@ -18,7 +18,7 @@ var Web3 = require("web3");
 var callStoreOnLocalGanache = async function () {
   //let web3 = new Web3("http://localhost:7545");
   const web3 = new Web3(
-    new Web3.providers.HttpProvider("http://127.0.0.1:7545/")
+    new Web3.providers.HttpProvider("http://127.0.0.1:7545")
   );
   const accounts = await web3.eth.getAccounts();
 
@@ -30,7 +30,7 @@ var callStoreOnLocalGanache = async function () {
   var myContract = new web3.eth.Contract(abi, contractAddr, {
     from: web3.eth.defaultAccount,
   });
-  console.log(myContract);
+  // console.log(myContract);
   // Setting up public and private keys here for the transaction
   const keyOptions = [
     {
@@ -87,51 +87,52 @@ var callStoreOnLocalGanache = async function () {
             key: privateKeySeller,
             padding: crypto.constants.RSA_PKCS1_PSS_PADDING,
           });
+
           myContract.methods
-            .getBuyerSignature_024()
-            .call({ from: web3.eth.defaultAccount })
+            .setBuyerSignature_024("Ayush Verma 2 test")
+            .send({ from: web3.eth.defaultAccount })
             .then(function (recippt) {
               console.log(
-                "Retrieving the Transaction via the ganache NET",
-                JSON.stringify(recippt, null, 4)
+                "Submission of the Agreement is being processed via the ganache NET",
+                recippt
               );
+              myContract.methods
+                .getBuyerSignature_024()
+                .call({ from: web3.eth.defaultAccount })
+                .then(function (recippt) {
+                  console.log(
+                    "Retrieving the Transaction via the ganache NET",
+                    recippt
+                  );
+                })
+                .catch((error) => {
+                  console.log(error);
+                });
             })
             .catch((error) => {
               console.log(error);
             });
 
           myContract.methods
-            .setBuyerSignature_024("Ayush Verma 2 test")
-            .call({ from: web3.eth.defaultAccount })
-            .then(function (recippt) {
-              console.log(
-                "Submission of the Agreement is being processed via the ganache NET",
-                JSON.stringify(recippt, null, 4)
-              );
-            })
-            .catch((error) => {
-              console.log(error);
-            });
-          myContract.methods
-            .getSellerSignature_024()
-            .call({ from: web3.eth.defaultAccount })
-            .then(function (recippt) {
-              console.log(
-                "Retrieving the Transaction via the ganache NET",
-                JSON.stringify(recippt, null, 4)
-              );
-            })
-            .catch((error) => {
-              console.log(error);
-            });
-          myContract.methods
             .setSellerSignature_024("Namaste")
-            .call({ from: web3.eth.defaultAccount })
+            .send({ from: web3.eth.defaultAccount })
             .then(function (recippt) {
               console.log(
                 "Retrieving the Transaction via the ganache NET",
                 JSON.stringify(recippt, null, 4)
               );
+              myContract.methods
+                .getSellerSignature_024()
+                .call({ from: web3.eth.defaultAccount })
+                .then(function (recippt) {
+                  console.log(
+                    "Retrieving the Transaction via the ganache NET",
+                    JSON.stringify(recippt, null, 4)
+                  );
+                })
+                .catch((error) => {
+                  console.log(error);
+                });
             })
             .catch((error) => {
               console.log(error);
@@ -152,7 +153,7 @@ var callStoreOnLocalGanache = async function () {
     });
 };
 
-let contractAddr = "0x8e9a8455172E7DD0DF698ffe35932adBD80dF3e7";
+let contractAddr = "0xa3D47eAD2ff55448B2A254F04AcFA0a272a94628";
 let abi = [
   {
     inputs: [],
