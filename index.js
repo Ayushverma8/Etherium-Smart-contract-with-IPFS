@@ -87,10 +87,14 @@ var callStoreOnLocalGanache = async function () {
             key: privateKeySeller,
             padding: crypto.constants.RSA_PKCS1_PSS_PADDING,
           });
-
+          const signature_seller = crypto.sign("sha256", Buffer.from(raw), {
+            key: privateKeySeller,
+            padding: crypto.constants.RSA_PKCS1_PSS_PADDING,
+          });
+          console.log(signature_seller.toString("base64"));
           myContract.methods
-            .setBuyerSignature_024("Ayush Verma 2 test")
-            .send({ from: web3.eth.defaultAccount })
+            .setBuyerSignature_024(signature_buyer.toString("base64"))
+            .send({ from: web3.eth.defaultAccount, gas: "1000000" })
             .then(function (recippt) {
               console.log(
                 "Submission of the Agreement is being processed via the ganache NET",
@@ -114,8 +118,8 @@ var callStoreOnLocalGanache = async function () {
             });
 
           myContract.methods
-            .setSellerSignature_024("Namaste")
-            .send({ from: web3.eth.defaultAccount })
+            .setSellerSignature_024(signature_seller.toString("base64"))
+            .send({ from: web3.eth.defaultAccount, gas: "1000000" })
             .then(function (recippt) {
               console.log(
                 "Retrieving the Transaction via the ganache NET",
@@ -138,11 +142,6 @@ var callStoreOnLocalGanache = async function () {
               console.log(error);
             });
           console.log(signature_buyer.toString("base64"));
-          const signature_seller = crypto.sign("sha256", Buffer.from(raw), {
-            key: privateKeySeller,
-            padding: crypto.constants.RSA_PKCS1_PSS_PADDING,
-          });
-          console.log(signature_seller.toString("base64"));
         }
 
         // console.log(content.toString());
@@ -153,7 +152,7 @@ var callStoreOnLocalGanache = async function () {
     });
 };
 
-let contractAddr = "0xa3D47eAD2ff55448B2A254F04AcFA0a272a94628";
+let contractAddr = "0x885f0Ee46F491Fe6f9CAe045D1Ad39b5aBf9E536";
 let abi = [
   {
     inputs: [],
