@@ -1,9 +1,3 @@
-// import { createRequire } from "module";
-// const require = createRequire(import.meta.url);
-// import { create } from "ipfs-http-client";
-// import { AbortController } from "node-abort-controller";
-
-// const client = create();
 import { createRequire } from "module";
 
 const require = createRequire(import.meta.url);
@@ -16,7 +10,6 @@ const crypto = require("crypto");
 global.AbortController = AbortController;
 var Web3 = require("web3");
 var callStoreOnLocalGanache = async function () {
-  //let web3 = new Web3("http://localhost:7545");
   const web3 = new Web3(
     new Web3.providers.HttpProvider("http://127.0.0.1:7545")
   );
@@ -71,18 +64,21 @@ var callStoreOnLocalGanache = async function () {
       new TextEncoder().encode(
         "This agreement is between robert and jackson for purchase of dairy farm ice cream"
       ),
+      // Defined the agreement that needs to take place between two clients.
       { create: true }
     )
     .then(async (r) => {
       client.files.stat(MFS_path, { hash: true }).then(async (r) => {
         let ipfsAddr = r.cid.toString();
-        console.log("added file ipfs:", ipfsAddr);
+        console.log("File is added to the IPFS:", ipfsAddr);
         // console.log("created message on IPFS:", cid);
         const resp = await client.cat(ipfsAddr);
         let content = [];
         for await (const chunk of resp) {
           content = [...content, ...chunk];
+          // Getting the raw text from the IPFS system.
           const raw = Buffer.from(content).toString("utf8");
+          // Signing the signature from the buyer
           const signature_buyer = crypto.sign("sha256", Buffer.from(raw), {
             key: privateKeyBuyer,
             padding: crypto.constants.RSA_PKCS1_PSS_PADDING,
@@ -91,11 +87,13 @@ var callStoreOnLocalGanache = async function () {
             key: privateKeySeller,
             padding: crypto.constants.RSA_PKCS1_PSS_PADDING,
           });
+          // Converting the signature to base64 for easy transactions
           console.log(signature_seller.toString("base64"));
           myContract.methods
             .setBuyerSignature_024(signature_buyer.toString("base64"))
             .send({ from: web3.eth.defaultAccount, gas: "1000000" })
             .then(function (recippt) {
+              // Submitting the agreement for ganashe to forward to the local test net
               console.log(
                 "Submission of the Agreement is being processed via the ganache NET",
                 recippt
@@ -104,6 +102,7 @@ var callStoreOnLocalGanache = async function () {
                 .getBuyerSignature_024()
                 .call({ from: web3.eth.defaultAccount })
                 .then(function (recippt) {
+                  // Retreiving the transaction from the test net.
                   console.log(
                     "Retrieving the Transaction via the ganache NET",
                     recippt
@@ -118,7 +117,7 @@ var callStoreOnLocalGanache = async function () {
                     },
                     Buffer.from(recippt, "base64")
                   );
-
+                  // Fetching the keys and checking the public key of the buyer
                   // isVerified should be `true` if the signature is valid
                   console.log(
                     "Verifing signature from the IPFS file and matching it with the smart contract value"
@@ -137,6 +136,7 @@ var callStoreOnLocalGanache = async function () {
             .setSellerSignature_024(signature_seller.toString("base64"))
             .send({ from: web3.eth.defaultAccount, gas: "1000000" })
             .then(function (recippt) {
+              // Receiving the transaction from the seller
               console.log(
                 "Retrieving the Transaction via the ganache NET",
                 JSON.stringify(recippt, null, 4)
@@ -149,6 +149,7 @@ var callStoreOnLocalGanache = async function () {
                     "Retrieving the Transaction via the ganache NET",
                     JSON.stringify(recippt, null, 4)
                   );
+                  // Checking the transaction digest from the seller. The signatures will showcase the encrypted hash from the blockchain.
                   const isVerified = crypto.verify(
                     "sha256",
                     raw,
@@ -172,6 +173,7 @@ var callStoreOnLocalGanache = async function () {
             .catch((error) => {
               console.log(error);
             });
+          // Verifying the signature from the buyer and converting it to base64
           console.log(signature_buyer.toString("base64"));
         }
 
@@ -184,6 +186,7 @@ var callStoreOnLocalGanache = async function () {
 };
 
 let contractAddr = "0x885f0Ee46F491Fe6f9CAe045D1Ad39b5aBf9E536";
+// Getting abi from the blockchain network
 let abi = [
   {
     inputs: [],
